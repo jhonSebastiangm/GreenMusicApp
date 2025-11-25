@@ -40,7 +40,7 @@ Write-Host "    - Escanea QR code" -ForegroundColor White
 Write-Host "    - Comando: npm start" -ForegroundColor Yellow
 Write-Host ""
 
-$opcion = Read-Host "Selecciona una opción (1, 2, o 3)"
+$opcion = Read-Host "Selecciona una opcion (1, 2, o 3)"
 
 switch ($opcion) {
     "1" {
