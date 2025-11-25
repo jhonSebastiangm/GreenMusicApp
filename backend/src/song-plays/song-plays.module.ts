@@ -1,4 +1,4 @@
-import { Module } from '@nestjs/common';
+import { Module, forwardRef } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { SongPlaysService } from './song-plays.service';
 import { SongPlaysController } from './song-plays.controller';
@@ -11,7 +11,7 @@ import { ConfigModule } from '../config/config.module';
   imports: [
     TypeOrmModule.forFeature([SongPlay]),
     UsersModule,
-    SongsModule,
+    forwardRef(() => SongsModule),
     ConfigModule,
   ],
   controllers: [SongPlaysController],
