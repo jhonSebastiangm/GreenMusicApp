@@ -4,7 +4,7 @@ import { UsersService } from '../users/users.service';
 import { CreateUserDto } from '../users/dto/create-user.dto';
 import { FirebaseAuthGuard } from '../common/guards/firebase-auth.guard';
 import { CurrentUser } from '../common/decorators/current-user.decorator';
-import { User } from '../users/entities/user.entity';
+import { User, UserRole } from '../users/entities/user.entity';
 
 @Controller('auth')
 export class AuthController {
@@ -24,7 +24,7 @@ export class AuthController {
         firebase_uid: decodedToken.uid,
         email: firebaseUser.email || '',
         name: firebaseUser.displayName || firebaseUser.email || 'User',
-        role: 'user',
+        role: UserRole.USER,
       };
       user = await this.usersService.create(createUserDto);
     }
@@ -54,7 +54,7 @@ export class AuthController {
       firebase_uid: decodedToken.uid,
       email: firebaseUser.email || '',
       name: firebaseUser.displayName || firebaseUser.email || 'User',
-      role: 'user',
+      role: UserRole.USER,
     };
 
     const user = await this.usersService.create(createUserDto);
