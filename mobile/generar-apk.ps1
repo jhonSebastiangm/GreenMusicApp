@@ -1,31 +1,21 @@
 # Script para generar APK de Green Music
-# Requiere: Expo CLI y cuenta de Expo
 # Ejecutar desde la carpeta mobile/
 
 Write-Host "📱 Generando APK para Green Music" -ForegroundColor Cyan
 Write-Host "=================================" -ForegroundColor Cyan
 Write-Host ""
 
-# Cambiar a la carpeta mobile si estamos en scripts
-$scriptPath = Split-Path -Parent $MyInvocation.MyCommand.Path
-$projectRoot = Split-Path -Parent $scriptPath
-$mobilePath = Join-Path $projectRoot "mobile"
-
-if (Test-Path $mobilePath) {
-    Set-Location $mobilePath
-    Write-Host "📁 Cambiado a carpeta mobile/" -ForegroundColor Green
-}
-
 # Verificar que estamos en mobile
 if (-not (Test-Path "package.json")) {
-    Write-Host "❌ No se encontró package.json. Asegúrate de estar en la carpeta mobile/" -ForegroundColor Red
+    Write-Host "❌ Ejecuta este script desde la carpeta mobile/" -ForegroundColor Red
+    Write-Host "   Ejemplo: cd mobile; .\generar-apk.ps1" -ForegroundColor Yellow
     exit 1
 }
 
 # Verificar Expo CLI
 Write-Host "🔍 Verificando Expo CLI..." -ForegroundColor Yellow
 try {
-    $expoVersion = npx expo --version
+    $expoVersion = npx expo --version 2>$null
     Write-Host "✅ Expo CLI encontrado: $expoVersion" -ForegroundColor Green
 } catch {
     Write-Host "⚠️  Expo CLI no encontrado, instalando..." -ForegroundColor Yellow
@@ -59,7 +49,7 @@ switch ($opcion) {
         
         # Verificar EAS CLI
         try {
-            $easVersion = eas --version
+            $easVersion = eas --version 2>$null
             Write-Host "✅ EAS CLI encontrado" -ForegroundColor Green
         } catch {
             Write-Host "📦 Instalando EAS CLI..." -ForegroundColor Yellow
@@ -73,6 +63,15 @@ switch ($opcion) {
         Write-Host "   3. Ejecuta: eas build -p android --profile preview" -ForegroundColor White
         Write-Host ""
         Write-Host "💡 El APK se generará en la nube y recibirás un link para descargarlo" -ForegroundColor Yellow
+        
+        $continuar = Read-Host "¿Continuar con EAS login ahora? (s/n)"
+        if ($continuar -eq "s") {
+            eas login
+            Write-Host ""
+            Write-Host "✅ Login completado. Ahora ejecuta:" -ForegroundColor Green
+            Write-Host "   eas build:configure" -ForegroundColor Yellow
+            Write-Host "   eas build -p android --profile preview" -ForegroundColor Yellow
+        }
     }
     "2" {
         Write-Host ""
@@ -83,6 +82,14 @@ switch ($opcion) {
         Write-Host "   1. Ejecuta: expo login" -ForegroundColor White
         Write-Host "   2. Ejecuta: expo build:android" -ForegroundColor White
         Write-Host ""
+        
+        $continuar = Read-Host "¿Continuar con expo login ahora? (s/n)"
+        if ($continuar -eq "s") {
+            expo login
+            Write-Host ""
+            Write-Host "✅ Login completado. Ahora ejecuta:" -ForegroundColor Green
+            Write-Host "   expo build:android" -ForegroundColor Yellow
+        }
     }
     "3" {
         Write-Host ""
@@ -90,12 +97,12 @@ switch ($opcion) {
         Write-Host ""
         Write-Host "📱 Para probar en tu teléfono:" -ForegroundColor Cyan
         Write-Host "   1. Instala 'Expo Go' desde Play Store o App Store" -ForegroundColor White
-        Write-Host "   2. Ejecuta: npm start" -ForegroundColor White
+        Write-Host "   2. Asegúrate de estar en la misma WiFi que tu PC" -ForegroundColor White
         Write-Host "   3. Escanea el QR code con Expo Go" -ForegroundColor White
         Write-Host ""
         Write-Host "💻 Para probar en emulador:" -ForegroundColor Cyan
-        Write-Host "   - Android: npm start, luego presiona 'a'" -ForegroundColor White
-        Write-Host "   - iOS: npm start, luego presiona 'i'" -ForegroundColor White
+        Write-Host "   - Android: Presiona 'a' cuando aparezca el menú" -ForegroundColor White
+        Write-Host "   - iOS: Presiona 'i' cuando aparezca el menú" -ForegroundColor White
         Write-Host ""
         
         $iniciar = Read-Host "¿Iniciar ahora? (s/n)"
@@ -110,4 +117,3 @@ switch ($opcion) {
 
 Write-Host ""
 Write-Host "📚 Más información en: https://docs.expo.dev/build/introduction/" -ForegroundColor Cyan
-
