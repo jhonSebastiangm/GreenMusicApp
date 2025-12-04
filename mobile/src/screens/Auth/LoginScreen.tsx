@@ -17,21 +17,7 @@ const LoginScreen = ({ navigation }: any) => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [loading, setLoading] = useState(false);
-  const { loginDemo } = useAuth();
-
-  const handleDemoMode = async () => {
-    try {
-      setLoading(true);
-      logger.info('LoginScreen: Activating demo mode');
-      await loginDemo();
-      logger.info('LoginScreen: Demo mode activated successfully');
-    } catch (error: any) {
-      logger.error('LoginScreen: Error activating demo mode', error);
-      Alert.alert('Error', 'No se pudo activar el modo demo');
-    } finally {
-      setLoading(false);
-    }
-  };
+  const { login } = useAuth();
 
   const handleLogin = async () => {
     if (!email || !password) {
@@ -110,20 +96,6 @@ const LoginScreen = ({ navigation }: any) => {
           ¿No tienes cuenta? Regístrate aquí
         </Text>
       </TouchableOpacity>
-
-      <TouchableOpacity
-        onPress={handleDemoMode}
-        style={styles.demoButton}
-        disabled={loading}
-      >
-        {loading ? (
-          <ActivityIndicator color="#4CAF50" />
-        ) : (
-          <Text style={styles.demoButtonText}>
-            🎵 Probar sin registro (Modo Demo)
-          </Text>
-        )}
-      </TouchableOpacity>
     </View>
   );
 };
@@ -175,20 +147,6 @@ const styles = StyleSheet.create({
   linkText: {
     color: '#4CAF50',
     fontSize: 14,
-  },
-  demoButton: {
-    marginTop: 30,
-    padding: 15,
-    borderRadius: 8,
-    alignItems: 'center',
-    backgroundColor: '#f0f0f0',
-    borderWidth: 2,
-    borderColor: '#4CAF50',
-  },
-  demoButtonText: {
-    color: '#4CAF50',
-    fontSize: 16,
-    fontWeight: 'bold',
   },
 });
 

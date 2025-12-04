@@ -9,7 +9,6 @@ interface AuthContextType {
   token: string | null;
   loading: boolean;
   login: (token: string) => Promise<void>;
-  loginDemo: () => Promise<void>;
   register: (token: string) => Promise<void>;
   logout: () => Promise<void>;
   refreshUser: () => Promise<void>;
@@ -33,29 +32,12 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
     try {
       logger.debug('AuthContext: Loading stored authentication');
       
-      // Para la demo, siempre empezar desde login (no cargar sesión guardada)
-      // Comentar estas líneas si quieres que siempre empiece desde login:
+      // Cargar sesión guardada si existe
       const storedToken = await AsyncStorage.getItem('authToken');
       const storedUser = await AsyncStorage.getItem('user');
-      const demoMode = await AsyncStorage.getItem('demoMode');
 
-      // Si está en modo demo, limpiar datos para empezar desde cero
-      if (demoMode === 'true') {
-        logger.info('AuthContext: Demo mode detected, clearing stored auth for fresh start');
-        await AsyncStorage.removeItem('authToken');
-        await AsyncStorage.removeItem('user');
-        await AsyncStorage.removeItem('demoMode');
-        setLoading(false);
-        return;
-      }
-
-      // Modo demo: crear usuario de prueba automáticamente solo si no hay datos
-      if (!storedToken && !storedUser) {
-        logger.info('AuthContext: No stored auth, will show login screen');
-        // No crear demo automáticamente, dejar que el usuario elija
-        setLoading(false);
-        return;
-      }
+      // Limpiar cualquier dato de demo mode que pueda quedar
+      await AsyncStorage.removeItem('demoMode');
 
       if (storedToken && storedUser) {
         logger.info('AuthContext: Found stored auth, restoring session', {
@@ -66,10 +48,13 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
         setUser(JSON.parse(storedUser));
         logger.info('AuthContext: Session restored successfully');
       } else {
-        logger.info('AuthContext: No stored auth found');
+        logger.info('AuthContext: No stored auth found, showing login screen');
       }
     } catch (error) {
       logger.error('AuthContext: Error loading stored auth', error);
+      // En caso de error, asegurar que no hay sesión
+      setToken(null);
+      setUser(null);
     } finally {
       setLoading(false);
       logger.debug('AuthContext: Loading completed');
@@ -93,34 +78,6 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
       logger.error('AuthContext: Login error', error, {
         hasFirebaseToken: !!firebaseToken,
       });
-      throw error;
-    }
-  };
-
-  const loginDemo = async () => {
-    try {
-      logger.info('AuthContext: Starting demo login process');
-      const demoUser: User = {
-        id: 'demo-user-id',
-        email: 'demo@greenmusic.app',
-        name: 'Usuario Demo',
-        role: 'user',
-        points_balance: 1000,
-        created_at: new Date().toISOString(),
-        updated_at: new Date().toISOString(),
-      };
-      const demoToken = 'demo-token-' + Date.now();
-      
-      await AsyncStorage.setItem('authToken', demoToken);
-      await AsyncStorage.setItem('user', JSON.stringify(demoUser));
-      await AsyncStorage.setItem('demoMode', 'true');
-      
-      setToken(demoToken);
-      setUser(demoUser);
-      
-      logger.info('AuthContext: Demo login completed successfully');
-    } catch (error) {
-      logger.error('AuthContext: Demo login error', error);
       throw error;
     }
   };
@@ -151,6 +108,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
       logger.info('AuthContext: Starting logout process');
       await AsyncStorage.removeItem('authToken');
       await AsyncStorage.removeItem('user');
+      await AsyncStorage.removeItem('demoMode'); // Limpiar también demo mode si existe
       setToken(null);
       setUser(null);
       logger.info('AuthContext: Logout completed successfully');
@@ -173,7 +131,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
 
   return (
     <AuthContext.Provider
-      value={{ user, token, loading, login, loginDemo, register, logout, refreshUser }}
+      value={{ user, token, loading, login, register, logout, refreshUser }}
     >
       {children}
     </AuthContext.Provider>

@@ -16,22 +16,6 @@ export class FirebaseAuthGuard implements CanActivate {
 
   async canActivate(context: ExecutionContext): Promise<boolean> {
     const request = context.switchToHttp().getRequest();
-    
-    // Modo demo: permitir acceso sin autenticación real
-    const demoMode = request.headers['x-demo-mode'];
-    if (demoMode === 'true') {
-      // Crear usuario demo temporal
-      const demoUser = {
-        id: 'demo-user-id',
-        email: 'demo@greenmusic.app',
-        name: 'Usuario Demo',
-        role: 'user',
-        points_balance: 1000,
-      };
-      request.user = demoUser;
-      return true;
-    }
-
     const authHeader = request.headers.authorization;
 
     if (!authHeader || !authHeader.startsWith('Bearer ')) {

@@ -24,16 +24,8 @@ api.interceptors.request.use(
   async (config) => {
     try {
       const token = await AsyncStorage.getItem('authToken');
-      const demoMode = await AsyncStorage.getItem('demoMode');
       
-      // En modo demo, marcar la request pero no enviar token real
-      if (demoMode === 'true') {
-        config.headers['X-Demo-Mode'] = 'true';
-        logger.debug('API: Request in demo mode', {
-          method: config.method,
-          url: config.url,
-        });
-      } else if (token) {
+      if (token) {
         config.headers.Authorization = `Bearer ${token}`;
         logger.debug('API: Request with auth token', {
           method: config.method,
@@ -83,6 +75,7 @@ api.interceptors.response.use(
       logger.warn('API: Unauthorized, clearing auth storage');
       await AsyncStorage.removeItem('authToken');
       await AsyncStorage.removeItem('user');
+      await AsyncStorage.removeItem('demoMode'); // Limpiar también demo mode si existe
     }
 
     return Promise.reject(error);
