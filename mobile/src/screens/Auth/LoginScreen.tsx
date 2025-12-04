@@ -12,6 +12,9 @@ import { useAuth } from '../../context/AuthContext';
 import { signInWithEmailAndPassword } from 'firebase/auth';
 import { getAuthInstance } from '../../services/firebase';
 import { logger } from '../../utils/logger';
+import { Colors, Typography, Spacing } from '../../theme';
+import Logo from '../../components/Logo';
+import { getFontFamily } from '../../utils/fonts';
 
 const LoginScreen = ({ navigation }: any) => {
   const [email, setEmail] = useState('');
@@ -70,7 +73,9 @@ const LoginScreen = ({ navigation }: any) => {
 
   return (
     <View style={styles.container}>
-      <Text style={styles.title}>Green Music</Text>
+      <View style={styles.logoContainer}>
+        <Logo size="large" />
+      </View>
       <Text style={styles.subtitle}>Inicia sesión para continuar</Text>
 
       <TextInput
@@ -132,63 +137,67 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     justifyContent: 'center',
-    padding: 20,
-    backgroundColor: '#fff',
+    padding: Spacing.padding.lg,
+    backgroundColor: Colors.background,
   },
-  title: {
-    fontSize: 32,
-    fontWeight: 'bold',
-    color: '#4CAF50',
-    textAlign: 'center',
-    marginBottom: 10,
+  logoContainer: {
+    alignItems: 'center',
+    marginBottom: Spacing.margin.lg,
   },
   subtitle: {
-    fontSize: 16,
-    color: '#666',
+    fontSize: Typography.fontSize.body,
+    fontFamily: getFontFamily('regular'),
+    color: Colors.textSecondary,
     textAlign: 'center',
-    marginBottom: 40,
+    marginBottom: Spacing.margin.xl,
   },
   input: {
     borderWidth: 1,
-    borderColor: '#ddd',
-    borderRadius: 8,
-    padding: 15,
-    marginBottom: 15,
-    fontSize: 16,
+    borderColor: Colors.border,
+    borderRadius: Spacing.borderRadius.md,
+    padding: Spacing.padding.md,
+    marginBottom: Spacing.margin.md,
+    fontSize: Typography.fontSize.body,
+    fontFamily: getFontFamily('regular'),
+    color: Colors.textPrimary,
+    backgroundColor: Colors.background,
   },
   button: {
-    backgroundColor: '#4CAF50',
-    padding: 15,
-    borderRadius: 8,
+    backgroundColor: Colors.primary,
+    padding: Spacing.padding.md,
+    borderRadius: Spacing.borderRadius.md,
     alignItems: 'center',
-    marginTop: 10,
+    marginTop: Spacing.margin.sm,
   },
   buttonText: {
-    color: '#fff',
-    fontSize: 16,
-    fontWeight: 'bold',
+    color: Colors.textOnPrimary,
+    fontSize: Typography.fontSize.button,
+    fontFamily: getFontFamily('bold'),
+    fontWeight: Typography.fontWeight.bold,
   },
   linkButton: {
-    marginTop: 20,
+    marginTop: Spacing.margin.lg,
     alignItems: 'center',
   },
   linkText: {
-    color: '#4CAF50',
-    fontSize: 14,
+    color: Colors.primary,
+    fontSize: Typography.fontSize.bodySmall,
+    fontFamily: getFontFamily('medium'),
   },
   demoButton: {
-    marginTop: 30,
-    padding: 15,
-    borderRadius: 8,
+    marginTop: Spacing.margin.xl,
+    padding: Spacing.padding.md,
+    borderRadius: Spacing.borderRadius.md,
     alignItems: 'center',
-    backgroundColor: '#f0f0f0',
+    backgroundColor: Colors.surface,
     borderWidth: 2,
-    borderColor: '#4CAF50',
+    borderColor: Colors.secondary,
   },
   demoButtonText: {
-    color: '#4CAF50',
-    fontSize: 16,
-    fontWeight: 'bold',
+    color: Colors.secondary,
+    fontSize: Typography.fontSize.button,
+    fontFamily: getFontFamily('bold'),
+    fontWeight: Typography.fontWeight.bold,
   },
 });
 
