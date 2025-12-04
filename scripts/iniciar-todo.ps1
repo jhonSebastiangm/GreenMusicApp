@@ -59,7 +59,7 @@ Start-Sleep -Seconds 3
 # Iniciar Admin Panel
 Write-Host "  Iniciando Admin Panel (Next.js)..." -ForegroundColor Blue
 $adminPath = Join-Path $projectRoot "admin"
-Start-Process powershell -ArgumentList "-NoExit", "-Command", "cd '$adminPath'; Write-Host 'Admin Panel (Next.js) - Green Music' -ForegroundColor Cyan; Write-Host '====================================' -ForegroundColor Cyan; Write-Host ''; npm run dev"
+Start-Process powershell -ArgumentList "-NoExit", "-Command", "cd '$adminPath'; Write-Host 'Admin Panel (Next.js) - Green Music' -ForegroundColor Cyan; Write-Host '====================================' -ForegroundColor Cyan; Write-Host ''; `$env:PORT=3001; npm run dev"
 Start-Sleep -Seconds 3
 
 # Iniciar Mobile App

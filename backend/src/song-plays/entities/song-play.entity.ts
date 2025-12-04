@@ -11,7 +11,6 @@ import { User } from '../../users/entities/user.entity';
 import { Song } from '../../songs/entities/song.entity';
 
 @Entity('song_plays')
-@Index(['user_id', 'song_id'])
 export class SongPlay {
   @PrimaryGeneratedColumn('uuid')
   id: string;

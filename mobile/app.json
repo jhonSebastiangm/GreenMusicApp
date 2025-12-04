@@ -4,10 +4,10 @@
     "slug": "green-music",
     "version": "1.0.0",
     "orientation": "portrait",
-    "icon": "./assets/icon.png",
+    // "icon": "./assets/icon.png", // Comentado temporalmente
     "userInterfaceStyle": "light",
     "splash": {
-      "image": "./assets/splash.png",
+      // "image": "./assets/splash.png", // Comentado temporalmente
       "resizeMode": "contain",
       "backgroundColor": "#ffffff"
     },
@@ -20,7 +20,7 @@
     },
     "android": {
       "adaptiveIcon": {
-        "foregroundImage": "./assets/adaptive-icon.png",
+        // "foregroundImage": "./assets/adaptive-icon.png", // Comentado temporalmente
         "backgroundColor": "#ffffff"
       },
       "package": "com.greenmusic.app"

@@ -10,30 +10,58 @@ import {
 } from 'react-native';
 import { useAuth } from '../../context/AuthContext';
 import { signInWithEmailAndPassword } from 'firebase/auth';
-import { auth } from '../../services/firebase';
+import { getAuthInstance } from '../../services/firebase';
+import { logger } from '../../utils/logger';
 
 const LoginScreen = ({ navigation }: any) => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [loading, setLoading] = useState(false);
-  const { login } = useAuth();
+  const { loginDemo } = useAuth();
+
+  const handleDemoMode = async () => {
+    try {
+      setLoading(true);
+      logger.info('LoginScreen: Activating demo mode');
+      await loginDemo();
+      logger.info('LoginScreen: Demo mode activated successfully');
+    } catch (error: any) {
+      logger.error('LoginScreen: Error activating demo mode', error);
+      Alert.alert('Error', 'No se pudo activar el modo demo');
+    } finally {
+      setLoading(false);
+    }
+  };
 
   const handleLogin = async () => {
     if (!email || !password) {
+      logger.warn('LoginScreen: Campos incompletos');
       Alert.alert('Error', 'Por favor completa todos los campos');
       return;
     }
 
     setLoading(true);
+    logger.info('LoginScreen: Iniciando proceso de login', { email });
     try {
+      // Obtener instancia de auth de forma segura
+      const authInstance = await getAuthInstance();
+      logger.debug('LoginScreen: Autenticando con Firebase');
       const userCredential = await signInWithEmailAndPassword(
-        auth,
+        authInstance,
         email,
         password,
       );
+      logger.debug('LoginScreen: Firebase auth exitoso, obteniendo token');
       const token = await userCredential.user.getIdToken();
+      logger.debug('LoginScreen: Token obtenido, llamando a login del contexto');
       await login(token);
+      logger.info('LoginScreen: Login completado exitosamente');
     } catch (error: any) {
+      logger.error('LoginScreen: Error en login', error, {
+        email,
+        errorCode: error.code,
+        errorMessage: error.message,
+      });
       Alert.alert('Error', error.message || 'Error al iniciar sesión');
     } finally {
       setLoading(false);
@@ -81,6 +109,20 @@ const LoginScreen = ({ navigation }: any) => {
         <Text style={styles.linkText}>
           ¿No tienes cuenta? Regístrate aquí
         </Text>
+      </TouchableOpacity>
+
+      <TouchableOpacity
+        onPress={handleDemoMode}
+        style={styles.demoButton}
+        disabled={loading}
+      >
+        {loading ? (
+          <ActivityIndicator color="#4CAF50" />
+        ) : (
+          <Text style={styles.demoButtonText}>
+            🎵 Probar sin registro (Modo Demo)
+          </Text>
+        )}
       </TouchableOpacity>
     </View>
   );
@@ -133,6 +175,20 @@ const styles = StyleSheet.create({
   linkText: {
     color: '#4CAF50',
     fontSize: 14,
+  },
+  demoButton: {
+    marginTop: 30,
+    padding: 15,
+    borderRadius: 8,
+    alignItems: 'center',
+    backgroundColor: '#f0f0f0',
+    borderWidth: 2,
+    borderColor: '#4CAF50',
+  },
+  demoButtonText: {
+    color: '#4CAF50',
+    fontSize: 16,
+    fontWeight: 'bold',
   },
 });
 

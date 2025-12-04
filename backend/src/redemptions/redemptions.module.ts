@@ -5,12 +5,14 @@ import { RedemptionsController } from './redemptions.controller';
 import { Redemption } from './entities/redemption.entity';
 import { UsersModule } from '../users/users.module';
 import { ProductsModule } from '../products/products.module';
+import { AuthModule } from '../auth/auth.module';
 
 @Module({
   imports: [
     TypeOrmModule.forFeature([Redemption]),
-    UsersModule,
+    UsersModule, // Ya está importado, también sirve para FirebaseAuthGuard
     ProductsModule,
+    AuthModule, // Para FirebaseAuthGuard (FirebaseService)
   ],
   controllers: [RedemptionsController],
   providers: [RedemptionsService],

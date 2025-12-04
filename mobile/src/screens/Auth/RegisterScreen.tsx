@@ -10,7 +10,8 @@ import {
 } from 'react-native';
 import { useAuth } from '../../context/AuthContext';
 import { createUserWithEmailAndPassword } from 'firebase/auth';
-import { auth } from '../../services/firebase';
+import { auth, getAuthInstance } from '../../services/firebase';
+import { logger } from '../../utils/logger';
 
 const RegisterScreen = ({ navigation }: any) => {
   const [name, setName] = useState('');
@@ -32,16 +33,47 @@ const RegisterScreen = ({ navigation }: any) => {
 
     setLoading(true);
     try {
+      // Validar y obtener auth de forma segura (ahora es async)
+      let authInstance;
+      try {
+        logger.debug('RegisterScreen: Obteniendo auth instance...');
+        authInstance = await getAuthInstance();
+        logger.debug('RegisterScreen: Auth instance obtenida correctamente');
+      } catch (authError: any) {
+        logger.error('RegisterScreen: Error al obtener auth instance', authError);
+        Alert.alert(
+          'Error de Configuración',
+          'Firebase no está configurado correctamente. Por favor, verifica la configuración de la app.\n\n' + authError.message
+        );
+        setLoading(false);
+        return;
+      }
+
+      logger.info('RegisterScreen: Creando usuario en Firebase', { email });
       const userCredential = await createUserWithEmailAndPassword(
-        auth,
+        authInstance,
         email,
         password,
       );
+      logger.debug('RegisterScreen: Usuario creado en Firebase', { uid: userCredential.user.uid });
       await userCredential.user.updateProfile({ displayName: name });
       const token = await userCredential.user.getIdToken();
       await register(token);
     } catch (error: any) {
-      Alert.alert('Error', error.message || 'Error al registrarse');
+      console.error('Register error:', error);
+      let errorMessage = 'Error al registrarse';
+      
+      if (error.code === 'auth/email-already-in-use') {
+        errorMessage = 'Este email ya está registrado. Intenta iniciar sesión.';
+      } else if (error.code === 'auth/invalid-email') {
+        errorMessage = 'El email no es válido';
+      } else if (error.code === 'auth/weak-password') {
+        errorMessage = 'La contraseña es muy débil';
+      } else if (error.message) {
+        errorMessage = error.message;
+      }
+      
+      Alert.alert('Error', errorMessage);
     } finally {
       setLoading(false);
     }

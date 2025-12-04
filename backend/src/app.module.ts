@@ -28,7 +28,7 @@ import { AppConfig } from './config/entities/app-config.entity';
       password: process.env.DATABASE_PASSWORD || 'postgres',
       database: process.env.DATABASE_NAME || 'green_music',
       entities: [User, Song, Product, Redemption, SongPlay, AppConfig],
-      synchronize: process.env.NODE_ENV === 'development',
+      synchronize: false, // Desactivado porque la BD ya está creada desde scripts SQL
       logging: process.env.NODE_ENV === 'development',
     }),
     AuthModule,

@@ -7,12 +7,15 @@ import { UsersModule } from '../users/users.module';
 import { SongsModule } from '../songs/songs.module';
 import { ConfigModule } from '../config/config.module';
 
+import { AuthModule } from '../auth/auth.module';
+
 @Module({
   imports: [
     TypeOrmModule.forFeature([SongPlay]),
-    UsersModule,
+    UsersModule, // Ya está importado, también sirve para FirebaseAuthGuard
     forwardRef(() => SongsModule),
     ConfigModule,
+    AuthModule, // Para FirebaseAuthGuard (FirebaseService)
   ],
   controllers: [SongPlaysController],
   providers: [SongPlaysService],

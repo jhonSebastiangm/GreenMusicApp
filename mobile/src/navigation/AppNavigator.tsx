@@ -11,6 +11,7 @@ import ProfileScreen from '../screens/Profile/ProfileScreen';
 import UploadScreen from '../screens/Upload/UploadScreen';
 import CatalogScreen from '../screens/Catalog/CatalogScreen';
 import { Ionicons } from '@expo/vector-icons';
+import { logger } from '../utils/logger';
 
 const Stack = createStackNavigator();
 const Tab = createBottomTabNavigator();
@@ -50,12 +51,42 @@ const MainTabs = () => {
 const AppNavigator = () => {
   const { user, loading } = useAuth();
 
+  React.useEffect(() => {
+    logger.info('AppNavigator: Navigation state changed', {
+      hasUser: !!user,
+      loading,
+      userId: user?.id,
+    });
+  }, [user, loading]);
+
   if (loading) {
-    return null; // O un componente de loading
+    logger.debug('AppNavigator: Still loading, showing loading screen');
+    return (
+      <NavigationContainer>
+        <Stack.Navigator screenOptions={{ headerShown: false }}>
+          <Stack.Screen name="Loading" component={() => (
+            <React.Fragment>
+              {/* Pantalla de carga simple */}
+            </React.Fragment>
+          )} />
+        </Stack.Navigator>
+      </NavigationContainer>
+    );
   }
 
+  logger.debug('AppNavigator: Rendering navigation', {
+    authenticated: !!user,
+    screen: user ? 'MainTabs' : 'Auth',
+  });
+
   return (
-    <NavigationContainer>
+    <NavigationContainer
+      onReady={() => logger.info('AppNavigator: Navigation container ready')}
+      onStateChange={(state) => {
+        const routeName = state?.routes[state.index]?.name;
+        logger.debug('AppNavigator: Navigation state changed', { routeName });
+      }}
+    >
       <Stack.Navigator screenOptions={{ headerShown: false }}>
         {user ? (
           <>

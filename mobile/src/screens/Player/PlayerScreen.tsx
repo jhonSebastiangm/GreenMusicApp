@@ -34,16 +34,27 @@ const PlayerScreen = ({ route, navigation }: any) => {
   const loadSound = async () => {
     try {
       setLoading(true);
+      // Configurar modo de audio con volumen máximo
       await Audio.setAudioModeAsync({
         playsInSilentModeIOS: true,
         staysActiveInBackground: true,
+        allowsRecordingIOS: false,
+        shouldDuckAndroid: false,
       });
 
       const { sound: newSound } = await Audio.Sound.createAsync(
         { uri: song.audio_url },
-        { shouldPlay: false },
+        { 
+          shouldPlay: false,
+          volume: 1.0, // Volumen máximo (0.0 a 1.0)
+          isMuted: false,
+        },
         onPlaybackStatusUpdate,
       );
+      
+      // Asegurar volumen máximo explícitamente
+      await newSound.setVolumeAsync(1.0);
+      await newSound.setIsMutedAsync(false);
 
       setSound(newSound);
       const status = await newSound.getStatusAsync();
@@ -92,6 +103,9 @@ const PlayerScreen = ({ route, navigation }: any) => {
       if (isPlaying) {
         await sound.pauseAsync();
       } else {
+        // Asegurar volumen máximo antes de reproducir
+        await sound.setVolumeAsync(1.0);
+        await sound.setIsMutedAsync(false);
         await sound.playAsync();
       }
     } catch (error) {
