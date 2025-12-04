@@ -33,46 +33,28 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
     try {
       logger.debug('AuthContext: Loading stored authentication');
       
-      // Para la demo, siempre empezar desde login (no cargar sesión guardada)
-      // Comentar estas líneas si quieres que siempre empiece desde login:
-      const storedToken = await AsyncStorage.getItem('authToken');
-      const storedUser = await AsyncStorage.getItem('user');
-      const demoMode = await AsyncStorage.getItem('demoMode');
-
-      // Si está en modo demo, limpiar datos para empezar desde cero
-      if (demoMode === 'true') {
-        logger.info('AuthContext: Demo mode detected, clearing stored auth for fresh start');
-        await AsyncStorage.removeItem('authToken');
-        await AsyncStorage.removeItem('user');
-        await AsyncStorage.removeItem('demoMode');
-        setLoading(false);
-        return;
-      }
-
-      // Modo demo: crear usuario de prueba automáticamente solo si no hay datos
-      if (!storedToken && !storedUser) {
-        logger.info('AuthContext: No stored auth, will show login screen');
-        // No crear demo automáticamente, dejar que el usuario elija
-        setLoading(false);
-        return;
-      }
-
-      if (storedToken && storedUser) {
-        logger.info('AuthContext: Found stored auth, restoring session', {
-          hasToken: !!storedToken,
-          hasUser: !!storedUser,
-        });
-        setToken(storedToken);
-        setUser(JSON.parse(storedUser));
-        logger.info('AuthContext: Session restored successfully');
-      } else {
-        logger.info('AuthContext: No stored auth found');
-      }
+      // SIEMPRE empezar desde login - NO restaurar sesión guardada
+      // Esto asegura que la app siempre empiece desde cero
+      logger.info('AuthContext: Siempre empezar desde login - limpiando datos guardados');
+      
+      // Limpiar todos los datos de autenticación guardados
+      await AsyncStorage.removeItem('authToken');
+      await AsyncStorage.removeItem('user');
+      await AsyncStorage.removeItem('demoMode');
+      
+      // Asegurar que no hay usuario ni token
+      setToken(null);
+      setUser(null);
+      
+      logger.info('AuthContext: Datos limpiados - mostrando pantalla de login');
     } catch (error) {
       logger.error('AuthContext: Error loading stored auth', error);
+      // En caso de error, asegurar que no hay sesión
+      setToken(null);
+      setUser(null);
     } finally {
       setLoading(false);
-      logger.debug('AuthContext: Loading completed');
+      logger.debug('AuthContext: Loading completed - siempre desde login');
     }
   };
 
